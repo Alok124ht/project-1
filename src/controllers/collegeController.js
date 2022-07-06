@@ -17,7 +17,7 @@ const createCollege = async function (req, res) {
             if (!(validator.isValidCharacterLimit2to8(name) && validator.isValid(name))) {
                 return res.status(400).send({ status: false, message: "please provide your valid abbreviate college name, size of charctecr should be 2 to 8, e.g: iit or IIT" })
             }
-            const checkCollege = await collegeModel.findOne({ name: name.trim().toUpperCase()})
+            const checkCollege = await collegeModel.findOne({ name: name.trim().toUpperCase() })
             if (checkCollege) {
                 return res.status(400).send({ status: false, message: `college ${name} is already present` })
             }
@@ -27,7 +27,7 @@ const createCollege = async function (req, res) {
             if (!(validator.isValid(logoLink) && validator.isValidUrl(logoLink.toLowerCase()))) {
                 return res.status(400).send({ status: false, message: "please provide a valid link e.g: https://www.example.com or https://example.com " })
             }
-            const savedData = await collegeModel.create({name:name.trim().toUpperCase(), fullName:fullName.trim().toUpperCase(), logoLink:logoLink.trim().toLowerCase() });
+            const savedData = await collegeModel.create({ name: name.trim().toUpperCase(), fullName: fullName.trim().toUpperCase(), logoLink: logoLink.trim().toLowerCase() });
             return res.status(201).send({ status: true, data: savedData })
         }
         else {
@@ -49,19 +49,24 @@ const getCollegeData = async function (req, res) {
     try {
         const collegeName = req.query.collegeName
         if (collegeName) {
-            const collegeData = await collegeModel.findOne({ $or:[{name: collegeName.trim().toUpperCase(), isDeleted:false},{fullName:collegeName.trim().toUpperCase(), isDeleted:false}]})
+            const collegeData = await collegeModel.findOne({ $or: [{ name: collegeName.trim().toUpperCase(), isDeleted: false }, { fullName: collegeName.trim().toUpperCase(), isDeleted: false }] })
             if (!collegeData) {
-                return res.status(404).send({ status: false, message: `college name ${collegeName} is not found`})
+                return res.status(404).send({ status: false, message: `college name ${collegeName} is not found` })
             }
-            let internData = await internModel.find({ collegeId: collegeData._id, isDeleted:false }).select({ _id: 1, name: 1, email: 1, mobile: 1 })
+            let internData = await internModel.find({ collegeId: collegeData._id, isDeleted: false }).select({ _id: 1, name: 1, email: 1, mobile: 1 })
             if (Object.keys(internData).length == 0) {
                 internData = "No any Intern had Applied"
             }
-            const collegeDetail = { name: collegeData.name, fullName: collegeData.fullName, logoLink: collegeData.logoLink, interns: internData }
+            const collegeDetail = {
+                name: collegeData.name,
+                fullName: collegeData.fullName,
+                logoLink: collegeData.logoLink,
+                interns: internData
+            }
             return res.status(200).send({ status: true, data: collegeDetail })
         }
         else {
-           return res.status(400).send({ status: false, message: "please enter valid data" })
+            return res.status(400).send({ status: false, message: "please enter valid data" })
         }
     }
     catch (error) {
